@@ -23,7 +23,7 @@ function Csv() {
     data.append('product', files[0]);
     data.append('transaction', files[1]);
     data.append("minSupport", JSON.stringify(minSupport));
-    fetch(`http://localhost:8000/api/csv`, {
+    fetch(`https://fpgrowth-saw.herokuapp.com/api/csv`, {
       method: 'POST',
       body: data
 

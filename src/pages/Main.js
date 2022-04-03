@@ -42,7 +42,7 @@ function Main() {
     data.append('file', transactions[0]);
     data.append("dataProducts", JSON.stringify(products));
     data.append("minSupport", JSON.stringify(minSupport));
-    fetch(`http://localhost:8000/api/main`, {
+    fetch(`https://fpgrowth-saw.herokuapp.com/api/main`, {
       method: 'POST',
       body: data
 
