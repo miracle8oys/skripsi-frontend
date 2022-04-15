@@ -8,7 +8,9 @@ module.exports = {
       buy: '#f15858',
       primary: '#c8dbe0',
       secondary: '#78dcca',
-      background: '#ff77e9'
+      tertiary: '#8372a8',
+      background: '#ff77e9',
+      utility: '#95a364'
     },
 },
   plugins: [],
