@@ -11,12 +11,17 @@ function Main() {
   const [products, setProducts] = useState([]);
 
   const [minSupport, setMinSupport] = useState(0);
+  const [productAmount, setProductAmount] = useState(0);
 
   const [transactions, setTransactions] = useState(null);
 
   const [bestProducts, setBestProducts] = useState([]);
   const [result, setResult] = useState([]);
   const [itemset, setItemset] = useState([]);
+
+  const [stockPercentage, setStockPercentage] = useState(0);
+  const [expPercentage, setExpPercentage] = useState(0);
+  const [profitPercentage, setProfitPercentage] = useState(0);
 
   const handleAddProduct = () => {
     const rawDate = new Date(exp);
@@ -43,7 +48,12 @@ function Main() {
     const data = new FormData();
     data.append('file', transactions[0]);
     data.append("dataProducts", JSON.stringify(products));
-    data.append("minSupport", JSON.stringify(minSupport));
+    data.append("minSupport", JSON.stringify(minSupport));   
+    data.append("productAmount", JSON.stringify(productAmount));
+    data.append("stockPercentage", JSON.stringify(stockPercentage));
+    data.append("expPercentage", JSON.stringify(expPercentage));
+    data.append("profitPercentage", JSON.stringify(profitPercentage));
+    // https://fpgrowth-saw.herokuapp.com/api/main
     fetch(`https://fpgrowth-saw.herokuapp.com/api/main`, {
       method: 'POST',
       body: data
@@ -93,6 +103,23 @@ function Main() {
             <div className="grid justify-center">
               <label className="block text-sm font-medium text-gray-700">Min Support (%)</label>
               <input onChange={(e) => setMinSupport(e.target.value)} className="border-2 px-1 rounded-sm" type="text" />
+              <label className="block text-sm font-medium text-gray-700">Product Amount (%)</label>
+              <input onChange={(e) => setProductAmount(e.target.value)} className="border-2 px-1 rounded-sm" type="text" />
+            </div>
+
+            <div className="flex justify-center">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Stock Percentage (%)</label>
+                    <input onChange={(e) => setStockPercentage(e.target.value)} className="border-2 px-1 rounded-sm" type="number" />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Profit Percentage (%)</label>
+                    <input onChange={(e) => setProfitPercentage(e.target.value)} className="border-2 px-1 rounded-sm" type="number" />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Expired Percentage (%)</label>
+                    <input onChange={(e) => setExpPercentage(e.target.value)} className="border-2 px-1 rounded-sm" type="number" />
+                </div>
             </div>
           </div>
 
