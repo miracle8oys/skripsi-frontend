@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {BsFileEarmarkBarGraph, BsFileEarmarkCheck} from "react-icons/bs"
+import {BsFileEarmarkBarGraph, BsFileEarmarkCheck, BsInfoCircle} from "react-icons/bs"
 
 function Csv() {
 
@@ -15,6 +15,15 @@ function Csv() {
   const [stockPercentage, setStockPercentage] = useState(0);
   const [expPercentage, setExpPercentage] = useState(0);
   const [profitPercentage, setProfitPercentage] = useState(0);
+
+  const [showProductForm, setShowProductForm] = useState(true);
+  const [showUtilityForm, setShowUtilityForm] = useState(false);
+  const [showProductAtributeForm, setShowProductAtributeForm] = useState(false);
+  const [showResult, setShowResult] = useState(false);
+
+  const [itemsetDesc, setItemsetDesc] = useState(false);
+  const [supportDesc, setSupportDesc] = useState(false);
+  const [confidenceDesc, setconfidenceDesc] = useState(false);
 
 
 
@@ -34,7 +43,7 @@ function Csv() {
     data.append("stockPercentage", JSON.stringify(stockPercentage));
     data.append("expPercentage", JSON.stringify(expPercentage));
     data.append("profitPercentage", JSON.stringify(profitPercentage));
-    fetch(`https://fpgrowth-saw.herokuapp.com/api/csv`, {
+    fetch(`http://localhost:8000/api/csv`, {
       method: 'POST',
       body: data
 
@@ -55,32 +64,50 @@ function Csv() {
 
         <div className="text-center">
           <h1 className="text-2xl font-semibold py-10">Bundling Recomendation</h1>
+          {itemsetDesc &&
+           <p className="bg-tertiary font-semibold py-2 rounded">Itemset merupakan rekomendasi gabungan kombinasi item yg sesuai dengan hasil transaksi dan kriteria yg diberikan</p>
+          }
+          {supportDesc &&
+           <p className="bg-tertiary font-semibold py-2 rounded">Support merupakan nilai perbandingan antara penjualan hasil rekomendasi kombinasi item dengan keseluruhan transaksi yang terjadi</p>
+          }
+          {confidenceDesc &&
+           <p className="bg-tertiary font-semibold py-2 rounded">Confidence merupakan persentase perbandingan antara jumlah transaksi kombinasi itemset dengan salah satu itemnya sendiri</p>
+          }
         </div>
           
-        <div>
-              <label className="block text-xl font-medium text-gray-700">Product</label>
-              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                <div className="space-y-1 text-center">
-                  <BsFileEarmarkCheck className="w-52 h-16" />
-                  <div className="flex justify-center text-sm text-gray-600">
-                    <label
-                      htmlFor="file-upload"
-                      className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
-                    >
-                      <span className="text-primary">Upload a file</span>
-                      <input onChange={(e) => handleChangeInput(e)} id="file-upload" name="file-upload" type="file" className="sr-only" />
-                    </label>
-                  </div>
-                  <p className="text-xs text-gray-500">CSV up to 10MB</p>
+        {
+            showProductForm && 
+            <>
+                <div>
+                <label className="block text-xl font-medium text-gray-700">Produk</label>
+                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                    <div className="space-y-1 text-center">
+                        <div className="flex justify-center">
+                            <BsFileEarmarkCheck className="w-52 h-16" />
+                        </div>
+                    <div className="flex justify-center text-sm text-gray-600">
+                        <label
+                        htmlFor="file-upload"
+                        className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
+                        >
+                        <span className="text-primary">Upload a file</span>
+                        <input onChange={(e) => handleChangeInput(e)} id="file-upload" name="file-upload" type="file" className="sr-only" />
+                        </label>
+                    </div>
+                    <p className="text-xs text-gray-500">CSV up to 10MB</p>
+                    <p className="text-xs text-buy">File yang diinput merupakan atribut produk yang terdiri dari id, nama, stok, profit dan batas expired dari produk yg ditransaksikan</p>
+                    </div>
                 </div>
-              </div>
-            </div>
+                
+                </div>
 
-          <div>
+                <div>
               <label className="block text-xl font-medium text-gray-700">Transaction</label>
               <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
                 <div className="space-y-1 text-center">
-                  <BsFileEarmarkBarGraph className="w-52 h-16" />
+                    <div className="flex justify-center">
+                    <BsFileEarmarkBarGraph className="w-52 h-16" />
+                    </div>
                   <div className="flex justify-center text-sm text-gray-600">
                     <label
                       htmlFor="file-upload"
@@ -91,42 +118,81 @@ function Csv() {
                     </label>
                   </div>
                   <p className="text-xs text-gray-500">CSV up to 10MB</p>
+                  <p className="text-xs text-buy">File transaksi dapat berupa nama atau id dari produk yg terjual</p>
                 </div>
               </div>
             </div>
+            <div className="text-center my-3">
+                    <button onClick={() => {setShowProductForm(false); setShowUtilityForm(true)}} className="py-1 px-2 bg-secondary rounded-md">Submit</button>
+            </div>
+            </>
+        }
+
 
         <div>
-            <label className="block text-xl font-medium text-gray-700">Utiliy</label>
-            <div className="grid justify-center">
-              <label className="block text-sm font-medium text-gray-700">Min Support (%)</label>
-              <input onChange={(e) => setMinSupport(e.target.value)} className="border-2 px-1 rounded-sm" type="text" />
-              <label className="block text-sm font-medium text-gray-700">Product Amount (%)</label>
-              <input onChange={(e) => setProductAmount(e.target.value)} className="border-2 px-1 rounded-sm" type="text" />
-            </div>
+            {
+                showUtilityForm &&
+                <>
+                    <label className="block text-xl font-medium text-gray-700">Utiliy Form</label>
+                    <div className="grid justify-center">
+                        <label className="block text-sm font-medium text-gray-700 text-center">Min Support (%)</label>
+                        <p className="text-xs text-buy w-72">Minimum support merupakan batas minimum penjualan produk untuk dapat masuk kedalam rekomendasi</p>
+                        <div className="flex justify-center">
+                            <input onChange={(e) => setMinSupport(e.target.value)} className="border-2 px-1 rounded-sm w-32" type="text" />
+                        </div>
+                        <label className="block text-sm font-medium text-gray-700 text-center">Produk terbaik</label>
+                        <p className="text-xs text-buy w-72">Field Produk terbaik digunakan untuk menentukan jumlah produk yg akan masuk ke sistem rekomendasi</p>
+                        <div className="flex justify-center">
+                            <input onChange={(e) => setProductAmount(e.target.value)} className="border-2 px-1 rounded-sm w-32" type="text" />
+                        </div>
+                    </div>
+                    <div className="text-center my-3">
+                        <button onClick={() => {setShowUtilityForm(false); setShowProductAtributeForm(true)}} className="py-1 px-2 bg-secondary rounded-md">Submit</button>
+                    </div>
+                </>
+            }
 
-            <div className="flex justify-center">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Stock Percentage (%)</label>
-                    <input onChange={(e) => setStockPercentage(e.target.value)} className="border-2 px-1 rounded-sm" type="number" />
+            {
+                showProductAtributeForm &&
+
+                <>
+                <label className="block text-xl font-medium text-gray-700">Product Attribute Form</label>
+                <div className="flex justify-center">
+                    <p className="text-xs text-buy w-72 text-center">Form ini berfungsi sebagai penentuan prioritas masing - masing atribut produk dalam sistem rekomendasi</p>
                 </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Profit Percentage (%)</label>
-                    <input onChange={(e) => setProfitPercentage(e.target.value)} className="border-2 px-1 rounded-sm" type="number" />
+                <div className="flex justify-center">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Stock (%)</label>
+                        <input onChange={(e) => setStockPercentage(e.target.value)} className="border-2 px-1 rounded-sm" type="number" />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Profit (%)</label>
+                        <input onChange={(e) => setProfitPercentage(e.target.value)} className="border-2 px-1 rounded-sm" type="number" />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Expired (%)</label>
+                        <input value={100 - stockPercentage - profitPercentage} onChange={(e) => setExpPercentage(e.target.value)} className="border-2 px-1 rounded-sm" type="number" />
+                    </div>
                 </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Expired Percentage (%)</label>
-                    <input onChange={(e) => setExpPercentage(e.target.value)} className="border-2 px-1 rounded-sm" type="number" />
-                </div>
-            </div>
+
+                    <div className="text-center my-3">
+                        <button onClick={() => {handleSubmit(); setShowProductAtributeForm(false); setShowResult(true)}} className="py-1 px-2 bg-secondary rounded-md">Submit</button>
+                    </div>
+                </>
+            }
+
           </div>
 
-            <div className="text-center my-3">
-              <button onClick={handleSubmit} className="py-1 px-2 bg-secondary rounded-md">Submit</button>
-            </div>
       </div>
 
 
-      <div className="w-full">
+      
+
+
+      {
+          showResult &&
+          <>
+          <div className="w-full">
                        <label className="block text-xl font-medium text-gray-700">Result</label>
                     <div className="flex flex-col">
                             <div className="sm:-mx-6 lg:-mx-8">
@@ -138,17 +204,19 @@ function Csv() {
                                                     <th scope="col" className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400">
                                                         No
                                                     </th>
-                                                    <th scope="col" className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400">
-                                                        Itemset
+                                                    <th scope="col" className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400 flex items-center gap-1">
+                                                        Itemset <BsInfoCircle onClick={() => {setItemsetDesc(true); setSupportDesc(false); setconfidenceDesc(false)}} />
                                                     </th>
                                                     <th scope="col" className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400">
                                                         Product
                                                     </th>
-                                                    <th scope="col" className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400">
-                                                        Support 
+                                                    <th scope="col" className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400 flex items-center gap-1">
+                                                        Support <BsInfoCircle onClick={() => {setItemsetDesc(false); setSupportDesc(true); setconfidenceDesc(false)}} />
                                                     </th>
                                                     <th scope="col" className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400">
-                                                        Confidence
+                                                        <div className="flex items-center gap-1">
+                                                            Confidence <BsInfoCircle onClick={() => {setItemsetDesc(false); setSupportDesc(false); setconfidenceDesc(true)}} />
+                                                        </div>
                                                     </th>
                                                 </tr>
                                             </thead>
@@ -179,9 +247,7 @@ function Csv() {
                             </div>
                         </div>
                     </div>
-
-
-      <div className="w-full">
+        <div className="w-full">
         <label className="block text-xl font-medium text-gray-700">Best Product</label>
                     <div className="flex flex-col">
                             <div className="sm:-mx-6 lg:-mx-8">
@@ -276,6 +342,8 @@ function Csv() {
                             </div>
                         </div>
                     </div>
+          </>
+      }
 
                   
     </div>

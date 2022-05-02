@@ -5,7 +5,7 @@ module.exports = {
   theme: {
     colors: {
       sell: '#7fff00',
-      buy: '#f15858',
+      buy: '#8a8787',
       primary: '#c8dbe0',
       secondary: '#78dcca',
       tertiary: '#8372a8',
