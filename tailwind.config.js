@@ -10,7 +10,8 @@ module.exports = {
       secondary: '#78dcca',
       tertiary: '#8372a8',
       background: '#ff77e9',
-      utility: '#95a364'
+      utility: '#95a364',
+      mainbg: '#88bdeb'
     },
 },
   plugins: [],

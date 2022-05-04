@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {BsFileEarmarkBarGraph, BsFileEarmarkCheck, BsInfoCircle} from "react-icons/bs"
+import {BsFileEarmarkBarGraph, BsFileEarmarkCheck, BsInfoCircle, BsBoxArrowDown} from "react-icons/bs"
 
 function Csv() {
 
@@ -24,6 +24,9 @@ function Csv() {
   const [itemsetDesc, setItemsetDesc] = useState(false);
   const [supportDesc, setSupportDesc] = useState(false);
   const [confidenceDesc, setconfidenceDesc] = useState(false);
+
+  const [showBestProduct, setShowBestProduct] = useState(false);
+  const [showItemset, setShowItemset] = useState(false);
 
 
 
@@ -58,8 +61,31 @@ function Csv() {
     })
   }
 
+  const saveRecomendation = (e) => {
+    e.preventDefault();
+    const user_id = localStorage.getItem("user_id");
+    fetch('http://localhost:8000/save', {
+        headers: {
+            'Content-Type': 'Application/Json',
+        },
+        method: 'Post',
+        body: JSON.stringify({
+            user_id,
+            result
+        })
+    }
+    ).then((res) => {
+        return res.json();
+    }).then(result => {
+        console.log(result);
+    })
+    .catch(err => {
+        console.log(err);
+    })
+  };
+
   return (
-    <div className="App grid justify-center">
+    <div className="App grid justify-center bg-mainbg bg-opacity-25 min-h-[100vh]">
       <div className="w-[50vw]">
 
         <div className="text-center">
@@ -123,7 +149,7 @@ function Csv() {
               </div>
             </div>
             <div className="text-center my-3">
-                    <button onClick={() => {setShowProductForm(false); setShowUtilityForm(true)}} className="py-1 px-2 bg-secondary rounded-md">Submit</button>
+                    <button onClick={() => {setShowProductForm(false); setShowUtilityForm(true)}} className="py-1 px-2 bg-secondary rounded-md">Next</button>
             </div>
             </>
         }
@@ -136,18 +162,18 @@ function Csv() {
                     <label className="block text-xl font-medium text-gray-700">Utiliy Form</label>
                     <div className="grid justify-center">
                         <label className="block text-sm font-medium text-gray-700 text-center">Min Support (%)</label>
-                        <p className="text-xs text-buy w-72">Minimum support merupakan batas minimum penjualan produk untuk dapat masuk kedalam rekomendasi</p>
+                        <p className="text-xs text-buy w-72 py-2">Minimum support merupakan batas minimum penjualan produk untuk dapat masuk kedalam rekomendasi</p>
                         <div className="flex justify-center">
-                            <input onChange={(e) => setMinSupport(e.target.value)} className="border-2 px-1 rounded-sm w-32" type="text" />
+                            <input onChange={(e) => setMinSupport(e.target.value)} className="border-2 px-1 rounded w-40 h-10" type="text" />
                         </div>
                         <label className="block text-sm font-medium text-gray-700 text-center">Produk terbaik</label>
-                        <p className="text-xs text-buy w-72">Field Produk terbaik digunakan untuk menentukan jumlah produk yg akan masuk ke sistem rekomendasi</p>
+                        <p className="text-xs text-buy w-72 py-2">Field Produk terbaik digunakan untuk menentukan jumlah produk yg akan masuk ke sistem rekomendasi</p>
                         <div className="flex justify-center">
-                            <input onChange={(e) => setProductAmount(e.target.value)} className="border-2 px-1 rounded-sm w-32" type="text" />
+                            <input onChange={(e) => setProductAmount(e.target.value)} className="border-2 px-1 rounded w-40 h-10" type="text" />
                         </div>
                     </div>
                     <div className="text-center my-3">
-                        <button onClick={() => {setShowUtilityForm(false); setShowProductAtributeForm(true)}} className="py-1 px-2 bg-secondary rounded-md">Submit</button>
+                        <button onClick={() => {setShowUtilityForm(false); setShowProductAtributeForm(true)}} className="py-1 px-2 bg-secondary rounded-md">Next</button>
                     </div>
                 </>
             }
@@ -163,15 +189,15 @@ function Csv() {
                 <div className="flex justify-center">
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Stock (%)</label>
-                        <input onChange={(e) => setStockPercentage(e.target.value)} className="border-2 px-1 rounded-sm" type="number" />
+                        <input onChange={(e) => setStockPercentage(e.target.value)} className="border-2 px-1 rounded w-40 h-10" type="number" />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Profit (%)</label>
-                        <input onChange={(e) => setProfitPercentage(e.target.value)} className="border-2 px-1 rounded-sm" type="number" />
+                        <input onChange={(e) => setProfitPercentage(e.target.value)} className="border-2 px-1 rounded w-40 h-10" type="number" />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Expired (%)</label>
-                        <input value={100 - stockPercentage - profitPercentage} onChange={(e) => setExpPercentage(e.target.value)} className="border-2 px-1 rounded-sm" type="number" />
+                        <input value={100 - stockPercentage - profitPercentage} onChange={(e) => setExpPercentage(e.target.value)} className="border-2 px-1 rounded w-40 h-10" type="number" />
                     </div>
                 </div>
 
@@ -246,7 +272,14 @@ function Csv() {
                                 </div>
                             </div>
                         </div>
+                        <div className="text-center my-3">
+                            <button onClick={saveRecomendation} className="py-1 px-2 bg-secondary rounded-md font-semibold mx-7">Simpan</button>
+                            <button onClick={() => window.location.reload()} className="py-1 px-2 bg-secondary rounded-md font-semibold">Reset</button>
+                        </div>
                     </div>
+        <button onClick={() => setShowBestProduct(current => current = !current)} className="flex items-center gap-2 mb-2 h-10 bg-tertiary rounded w-48 justify-center font-semibold">Show Best Product <BsBoxArrowDown className="pt-1" /></button>
+        { showBestProduct &&
+            <>
         <div className="w-full">
         <label className="block text-xl font-medium text-gray-700">Best Product</label>
                     <div className="flex flex-col">
@@ -288,7 +321,12 @@ function Csv() {
                             </div>
                         </div>
                     </div>
+            </>
+        }
 
+            <button onClick={() => setShowItemset(current => current = !current)} className="flex gap-2 items-center mb-7 h-10 bg-secondary rounded w-48 justify-center font-semibold">Show Itemset <BsBoxArrowDown  className="pt-1"/></button>
+            {showItemset && 
+                <>
                     <div className="w-full pb-32">
                        <label className="block text-xl font-medium text-gray-700">Itemset</label>
                     <div className="flex flex-col">
@@ -342,6 +380,9 @@ function Csv() {
                             </div>
                         </div>
                     </div>
+                </>
+            }
+                    
           </>
       }
 

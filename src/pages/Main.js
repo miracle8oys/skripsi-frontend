@@ -70,7 +70,7 @@ function Main() {
   }
 
   return (
-    <div className="App grid justify-center">
+    <div className="App grid justify-center bg-mainbg bg-opacity-25 min-h-[100vh]">
       <div className="w-[50vw]">
         <div className="text-center">
             <h1 className="text-2xl font-semibold py-10">Bundling Recomendation</h1>
