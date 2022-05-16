@@ -22,8 +22,8 @@ export default function Login() {
         return res.json();
     }).then(result => {
         localStorage.setItem("username", `${result.data.username}`);
-        localStorage.setItem("company", `${result.data.company}`);
-        localStorage.setItem("user_id", `${result.data.user_id}`);
+        localStorage.setItem("company_id", `${result.data.company_id}`);
+        localStorage.setItem("user_id", `${result.data._id}`);
         navigate("/home")
     })
     .catch(err => {
@@ -34,8 +34,12 @@ export default function Login() {
   return (
     <div className="bg-mainbg bg-opacity-25 w-full min-h-screen flex justify-center items-center">
       <div className="bg-primary p-3 rounded-xl w-[20vw]">
-        <div className="w-full flex justify-center items-center gap-5 py-3">
+        <div className="w-full flex justify-between items-center py-3 px-10">
           <img src={'https://img2.pngdownload.id/20180420/zpw/kisspng-laptop-product-bundling-computer-service-bundles-5ada37ad48b7f8.9869221215242505412979.jpg'} className="h-[60px]" alt="iposlogo" />
+          <div>
+            <h1 className="font-semibold text-2xl">Bunding</h1>
+            <h1 className="font-semibold text-2xl">Recomendations</h1>
+          </div>
         </div>
         <div className="bg-buy bg-opacity-25 p-4 rounded-lg">
           <h1 className="text-xl text-center font-medium py-3">Login</h1>

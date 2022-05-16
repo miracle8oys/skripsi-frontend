@@ -1,5 +1,6 @@
 import { useState } from "react";
-import {BsFileEarmarkBarGraph, BsFileEarmarkCheck, BsInfoCircle, BsBoxArrowDown} from "react-icons/bs"
+import {BsFileEarmarkBarGraph, BsFileEarmarkCheck, BsInfoCircle} from "react-icons/bs"
+import {AiOutlineCloseCircle} from "react-icons/ai"
 
 function Csv() {
 
@@ -25,8 +26,9 @@ function Csv() {
   const [supportDesc, setSupportDesc] = useState(false);
   const [confidenceDesc, setconfidenceDesc] = useState(false);
 
-  const [showBestProduct, setShowBestProduct] = useState(false);
-  const [showItemset, setShowItemset] = useState(false);
+  const [mainDesc, setMainDesc] = useState('');
+
+  
 
 
 
@@ -71,7 +73,9 @@ function Csv() {
         method: 'Post',
         body: JSON.stringify({
             user_id,
-            result
+            result,
+            best_products: bestProducts,
+            itemset
         })
     }
     ).then((res) => {
@@ -84,20 +88,34 @@ function Csv() {
     })
   };
 
+  const resultExplanation = (itemset, product, support, confidence) => {
+      const probability = itemset.filter(i => i !== product);
+      console.log(`Kombinasi item ${itemset.join(' & ')} memiliki persentase terjual sebesar ${parseFloat(support).toFixed(2)}%, jika pengunjung membeli ${probability} maka ${parseFloat(confidence).toFixed(2)}% kemungkinan juga akan membeli ${product}`);
+      setMainDesc(`Kombinasi item ${itemset.join(' & ')} memiliki persentase terjual sebesar ${parseFloat(support).toFixed(2)}%, jika pengunjung membeli ${probability} maka ${parseFloat(confidence).toFixed(2)}% kemungkinan juga akan membeli ${product}`)
+  }
+
   return (
-    <div className="App grid justify-center bg-mainbg bg-opacity-25 min-h-[100vh]">
+    <div className="App grid justify-center bg-mainbg bg-opacity-25 min-h-[100vh] pb-72">
       <div className="w-[50vw]">
 
-        <div className="text-center">
+        <div className="text-center h-min">
           <h1 className="text-2xl font-semibold py-10">Bundling Recomendation</h1>
           {itemsetDesc &&
-           <p className="bg-tertiary font-semibold py-2 rounded">Itemset merupakan rekomendasi gabungan kombinasi item yg sesuai dengan hasil transaksi dan kriteria yg diberikan</p>
+           <p className="bg-tertiary font-semibold py-2 rounded flex justify-between items-center px-5">Itemset merupakan rekomendasi gabungan kombinasi item yg sesuai dengan hasil transaksi dan kriteria yg diberikan <AiOutlineCloseCircle className="text-2xl text-background" onClick={() => setItemsetDesc('')} /></p>
           }
           {supportDesc &&
-           <p className="bg-tertiary font-semibold py-2 rounded">Support merupakan nilai perbandingan antara penjualan hasil rekomendasi kombinasi item dengan keseluruhan transaksi yang terjadi</p>
+           <p className="bg-tertiary font-semibold py-2 rounded flex justify-between items-center px-5">Support merupakan nilai perbandingan antara penjualan hasil rekomendasi kombinasi item dengan keseluruhan transaksi yang terjadi <AiOutlineCloseCircle className="text-2xl text-background" onClick={() => setSupportDesc('')} /></p>
           }
           {confidenceDesc &&
-           <p className="bg-tertiary font-semibold py-2 rounded">Confidence merupakan persentase perbandingan antara jumlah transaksi kombinasi itemset dengan salah satu itemnya sendiri</p>
+           <p className="bg-tertiary font-semibold py-2 rounded flex justify-between items-center px-5">Confidence merupakan persentase perbandingan antara jumlah transaksi kombinasi itemset dengan salah satu itemnya sendiri <AiOutlineCloseCircle className="text-2xl text-background" onClick={() => setconfidenceDesc('')} /></p>
+          }
+
+          {
+              mainDesc &&
+              <div className="flex gap-3 items-center bg-tertiary px-2 py-1 rounded font-semibold">
+                  <h1>{mainDesc}</h1>
+                  <AiOutlineCloseCircle className="text-3xl text-background" onClick={() => setMainDesc('')} />
+              </div>
           }
         </div>
           
@@ -155,7 +173,7 @@ function Csv() {
         }
 
 
-        <div>
+        
             {
                 showUtilityForm &&
                 <>
@@ -207,7 +225,7 @@ function Csv() {
                 </>
             }
 
-          </div>
+          
 
       </div>
 
@@ -244,6 +262,11 @@ function Csv() {
                                                             Confidence <BsInfoCircle onClick={() => {setItemsetDesc(false); setSupportDesc(false); setconfidenceDesc(true)}} />
                                                         </div>
                                                     </th>
+                                                    <th scope="col" className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400">
+                                                        <div className="flex items-center gap-1">
+                                                            Action
+                                                        </div>
+                                                    </th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -264,6 +287,9 @@ function Csv() {
                                                         <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">
                                                             {parseFloat(item.confidence).toFixed(2)}%
                                                         </td>
+                                                        <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">
+                                                            <BsInfoCircle className="font-semibold text-xl" onClick={() => resultExplanation(item.itemset, item.product, item.support, item.confidence)} />
+                                                        </td>
                                                     </tr>
                                                 ))}
                                             </tbody>
@@ -277,111 +303,6 @@ function Csv() {
                             <button onClick={() => window.location.reload()} className="py-1 px-2 bg-secondary rounded-md font-semibold">Reset</button>
                         </div>
                     </div>
-        <button onClick={() => setShowBestProduct(current => current = !current)} className="flex items-center gap-2 mb-2 h-10 bg-tertiary rounded w-48 justify-center font-semibold">Show Best Product <BsBoxArrowDown className="pt-1" /></button>
-        { showBestProduct &&
-            <>
-        <div className="w-full">
-        <label className="block text-xl font-medium text-gray-700">Best Product</label>
-                    <div className="flex flex-col">
-                            <div className="sm:-mx-6 lg:-mx-8">
-                                <div className="inline-block py-2 min-w-full sm:px-6 lg:px-8">
-                                    <div className="overflow-hidden shadow-md sm:rounded-lg">
-                                        <table className="min-w-full">
-                                            <thead className="bg-tertiary text-white">
-                                                <tr>
-                                                    <th scope="col" className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400">
-                                                        ID
-                                                    </th>
-                                                    <th scope="col" className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400">
-                                                        Product Name
-                                                    </th>
-                                                    <th scope="col" className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400">
-                                                        Value
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {bestProducts.map(item => (
-                                                    <tr key={item.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                                        <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap">
-                                                            {item.id}
-                                                        </td>
-                                                        <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">
-                                                            {item.name}
-                                                        </td>
-                                                        <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">
-                                                            {Math.round(item.total * 100)}/100
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-            </>
-        }
-
-            <button onClick={() => setShowItemset(current => current = !current)} className="flex gap-2 items-center mb-7 h-10 bg-secondary rounded w-48 justify-center font-semibold">Show Itemset <BsBoxArrowDown  className="pt-1"/></button>
-            {showItemset && 
-                <>
-                    <div className="w-full pb-32">
-                       <label className="block text-xl font-medium text-gray-700">Itemset</label>
-                    <div className="flex flex-col">
-                            <div className="sm:-mx-6 lg:-mx-8">
-                                <div className="inline-block py-2 min-w-full sm:px-6 lg:px-8">
-                                    <div className="overflow-hidden shadow-md sm:rounded-lg">
-                                        <table className="min-w-full">
-                                            <thead className="bg-secondary text-white">
-                                                <tr>
-                                                    <th scope="col" className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400">
-                                                        No
-                                                    </th>
-                                                    <th scope="col" className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400">
-                                                        Itemset
-                                                    </th>
-                                                    <th scope="col" className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400">
-                                                        Product
-                                                    </th>
-                                                    <th scope="col" className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400">
-                                                        Support 
-                                                    </th>
-                                                    <th scope="col" className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400">
-                                                        Confidence
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {itemset.map((item, i) => (
-                                                    <tr key={i} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                                        <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap">
-                                                            {i + 1}
-                                                        </td>
-                                                        <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap">
-                                                            {item?.itemset.join(', ')}
-                                                        </td>
-                                                        <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">
-                                                            {item.product}
-                                                        </td>
-                                                        <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">
-                                                            {parseFloat(item.support).toFixed(2)}%
-                                                        </td>
-                                                        <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">
-                                                            {parseFloat(item.confidence).toFixed(2)}%
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </>
-            }
                     
           </>
       }

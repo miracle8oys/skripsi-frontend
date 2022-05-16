@@ -31,7 +31,7 @@ const Navbar = () => {
                       to="/csv"
                       className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-xl font-medium"
                     >
-                      Csv Input
+                      CSV Input
                     </Link>
   
                     <Link
